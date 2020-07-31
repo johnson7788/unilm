@@ -1,24 +1,24 @@
 # UniLM
-**Unified pre-training for natural language understanding (NLU) and generation (NLG)**
+**统一预训练的自然语言理解（NLU）和生成（NLG）模型**
 
 
-**```Update: ```** **Check out the latest information and models of UniLM at [https://github.com/microsoft/unilm/tree/master/unilm](https://github.com/microsoft/unilm/tree/master/unilm)**
+**```Update: ```** **查看UniLM的最新信息和模型 [https://github.com/microsoft/unilm/tree/master/unilm](https://github.com/microsoft/unilm/tree/master/unilm)**
 
 
 **\*\*\*\*\* October 1st, 2019: UniLM v1 release \*\*\*\*\***
 
-**UniLM v1** (September 30th, 2019): the code and pre-trained models for the NeurIPS 2019 paper entitled "[Unified Language Model Pre-training for Natural Language Understanding and Generation](https://arxiv.org/abs/1905.03197)". UniLM (v1) achieves the **new SOTA results** in **NLG** (especially **sequence-to-sequence generation**) tasks/benchmarks, including abstractive summarization (the Gigaword and CNN/DM dataset), question generation (the SQuAD QG dataset), etc. 
+**UniLM v1** (September 30th, 2019): NeurIPS 2019论文的代码和预训练模型,标题为 "[Unified Language Model Pre-training for Natural Language Understanding and Generation](https://arxiv.org/abs/1905.03197)". UniLM (v1) achieves the **new SOTA results** in **NLG** (especially **sequence-to-sequence generation**) tasks/benchmarks, 包括摘要抽取（Gigaword和CNN / DM数据集），问题生成（SQuAD QG数据集）等. 
 
 ## Environment
 
 ### Docker
 
-The recommended way to run the code is using docker under Linux:
+推荐的运行代码的方法是在Linux下使用docker：
 ```bash
 alias=`whoami | cut -d'.' -f2`; docker run -it --rm --runtime=nvidia --ipc=host --privileged -v /home/${alias}:/home/${alias} pytorch/pytorch:1.1.0-cuda10.0-cudnn7.5-devel bash
 ```
 
-The docker is initialized by:
+docker通过以下方式初始化:
 ```bash
 . .bashrc
 apt-get update
@@ -36,9 +36,9 @@ pip install --user tensorboardX six numpy tqdm path.py pandas scikit-learn lmdb 
 python -c "import nltk; nltk.download('punkt')"
 pip install -e git://github.com/Maluuba/nlg-eval.git#egg=nlg-eval
 ```
-The mixed-precision training code requires the specific version of [NVIDIA/apex](https://github.com/NVIDIA/apex/tree/1603407bf49c7fc3da74fceb6a6c7b47fece2ef8), which only supports pytorch<1.2.0.
+混合精度训练代码需要特定版本 [NVIDIA/apex](https://github.com/NVIDIA/apex/tree/1603407bf49c7fc3da74fceb6a6c7b47fece2ef8), which only supports pytorch<1.2.0.
 
-Install the repo as a package in the docker:
+将unilm安装到docker:
 ```bash
 mkdir ~/code; cd ~/code
 git clone https://github.com/microsoft/unilm.git
@@ -46,26 +46,26 @@ cd ~/code/unilm/unilm-v1/src
 pip install --user --editable .
 ```
 
-## Pre-trained Models
-We release both base-size and large-size **cased** UniLM models pre-trained with **Wikipedia and BookCorpus** corpora. The models are trained by using the same model configuration and WordPiece vocabulary as BERT. The model parameters can be loaded as in the fine-tuning code.
+## 预训练模型
+我们发布了使用** Wikipedia和BookCorpus **语料库预先训练的基本尺寸和大型**cased** UniLM模型。使用与BERT相同的模型配置和WordPiece词汇表来训练模型。模型参数在微调的代码中可以加载。
 
-The links to the pre-trained models:
+预训练模型的链接:
 - [unilm1-large-cased](https://unilm.blob.core.windows.net/ckpt/unilm1-large-cased.bin): 24-layer, 1024-hidden, 16-heads, 340M parameters
 - [unilm1-base-cased](https://unilm.blob.core.windows.net/ckpt/unilm1-base-cased.bin): 12-layer, 768-hidden, 12-heads, 110M parameters
 
 ## Fine-tuning
-We provide instructions on how to fine-tune UniLM as a sequence-to-sequence model to support various downstream natural language generation tasks as follows. It is recommended to use 2 or 4 v100-32G GPU cards to fine-tune the model. Gradient accumulation (`--gradient_accumulation_steps`) can be enabled if there is an OOM error.
+我们提供有关如何将UniLM调整为序列到序列模型以支持各种下游自然语言生成任务的说明，如下所示。建议使用2或4个v100-32G GPU微调模型。如果存在OOM错误，则可以Gradient accumulation参数(`--gradient_accumulation_steps`)
 
 ### Abstractive Summarization - [Gigaword](https://github.com/harvardnlp/sent-summary) (10K)
 
-In the example, only 10K examples of the Gigaword training data are used to fine-tune UniLM. As shown in the following table, pre-training significantly improves performance for low-resource settings.
+在该示例中，仅10K的Gigaword训练数据示例用于微调UniLM。如下表所示，预训练可显着提高low-resource设置的性能。
 
 | Model                                                               | ROUGE-1   | ROUGE-2   | ROUGE-L   |
 | ------------------------------------------------------------------- | --------- | --------- | --------- |
 | [Transformer](http://proceedings.mlr.press/v97/song19d/song19d.pdf) | 10.97     | 2.23      | 10.42     |
 | **UniLM**                                                           | **34.21** | **15.28** | **31.54** |
 
-The data can be downloaded from [here](https://drive.google.com/open?id=1USoQ8lJgN8kAWnUnRrupMGrPMLlDVqlV).
+数据下载位置[here](https://drive.google.com/open?id=1USoQ8lJgN8kAWnUnRrupMGrPMLlDVqlV).
 
 ```bash
 # run fine-tuning
@@ -88,7 +88,7 @@ python biunilm/run_seq2seq.py --do_train --fp16 --amp --num_workers 0 \
   --num_train_epochs 30
 ```
 
-We provide a fine-tuned checkpoint (downloaded from [here](https://drive.google.com/open?id=1yKFBpT2dbN5d6WBjFlJqlXs9DQKCbRWe)) used for decoding. The inference and evaluation process is conducted as follows:
+一个fine-tuned checkpoint (downloaded from [here](https://drive.google.com/open?id=1yKFBpT2dbN5d6WBjFlJqlXs9DQKCbRWe)) 用于 decoding. 推理和评估过程如下:
 ```bash
 # run decoding
 DATA_DIR=/{path_of_data}/gigaword
